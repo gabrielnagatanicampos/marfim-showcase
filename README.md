@@ -62,9 +62,8 @@ flowchart LR
 - Desenhei os dados: pacientes, agenda, conversas, profissionais e permissões.
 - Defini os critérios de aceite de cada funcionalidade.
 - Orientei e revisei o trabalho da IA, que escreveu boa parte do código.
-- Conduzi o projeto em Scrum, com backlog e entregas curtas.
 
-Time: eu (único que programa), Joaquim (vendas) e JP (odontologia e Instagram).
+Sou co-fundador e construí todo o sistema, com apoio de IA generativa. Os outros três sócios cuidam de marketing, odontologia e vendas.
 
 > Boa parte do código foi construída com apoio de IA generativa, e os testes automáticos também; eu defino o que o sistema precisa fazer e reviso o resultado.
 
@@ -87,7 +86,7 @@ Python, FastAPI, PostgreSQL, Redis, n8n e Docker. Verificações automáticas ro
 
 1. Pré-lançamento interno, sem clientes e sem piloto real.
 2. Tudo foi simulado e testado, mas ainda não rodou com pacientes de verdade.
-3. Versões `v0.1.0` e `v0.1.1` publicadas.
+3. Versões `v0.1.0` e `v0.1.1` marcadas no repositório privado.
 4. Falta: corrigir os dois riscos médios, contratar servidor e domínio, passar por revisão jurídica e fazer o primeiro piloto com uma clínica.
 
 ## Autor
