@@ -71,7 +71,7 @@ Foram feitos 3 relatórios de segurança.
 
 | Item | Situação |
 |---|---|
-| Falha de severidade **Alta**: profissional conseguia alcançar paciente de outra clínica | Encontrada e **corrigida** |
+| Falha de severidade **Alta**: profissional conseguia alcançar paciente de outro profissional | Encontrada e **corrigida** |
 | M-1 (risco médio) | **Aberto e documentado** |
 | M-2 (risco médio) | **Aberto e documentado** |
 
