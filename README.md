@@ -1,9 +1,8 @@
 <div align="center">
 
-# MARFIM
+![MARFIM](assets/capa.png)
 
-**Assistente de IA no WhatsApp para clínicas odontológicas**
-*(antes chamado Nexus)*
+**Um assistente que atende pacientes de clínicas odontológicas pelo WhatsApp.**
 
 ![Status](https://img.shields.io/badge/status-pr%C3%A9--lan%C3%A7amento-0B1220?style=for-the-badge&logo=rocket&logoColor=3B82F6)
 ![Python](https://img.shields.io/badge/Python-0B1220?style=for-the-badge&logo=python&logoColor=3B82F6)
@@ -12,115 +11,84 @@
 ![Redis](https://img.shields.io/badge/Redis-0B1220?style=for-the-badge&logo=redis&logoColor=3B82F6)
 ![n8n](https://img.shields.io/badge/n8n-0B1220?style=for-the-badge&logo=n8n&logoColor=3B82F6)
 ![Docker](https://img.shields.io/badge/Docker-0B1220?style=for-the-badge&logo=docker&logoColor=3B82F6)
-![GitHub Actions](https://img.shields.io/badge/CI-GitHub_Actions-0B1220?style=for-the-badge&logo=githubactions&logoColor=3B82F6)
 
 </div>
 
-> **Aviso importante.** Este repositório é uma vitrine. O código do MARFIM é **privado**. Aqui está só a descrição do que foi construído, escrita a partir de fatos que consigo sustentar. O projeto está em **pré-lançamento interno**: não há clientes pagantes, não há piloto real e não há métricas de uso.
+O MARFIM (antes chamado Nexus) é um SaaS em pré-lançamento: um assistente virtual que responde os pacientes no WhatsApp e entrega à clínica um painel com agenda, pacientes e conversas. Ainda não tem clientes.
 
-## O que é
+> O código é privado. Esta página mostra o que foi construído e qual foi o meu papel, só com o que consigo comprovar. As telas abaixo usam dados fictícios.
 
-O MARFIM é um SaaS de assistente virtual de IA que atende pacientes no WhatsApp para clínicas odontológicas, e entrega à clínica um painel com agenda própria, pacientes e conversas.
+## O problema e a ideia
 
-Time: Gabriel (único que programa), Joaquim (vendas) e JP (odontologia e Instagram).
+Clínica pequena responde WhatsApp à mão, entre um atendimento e outro, e à noite a mensagem fica sem resposta. O paciente que não é respondido a tempo marca em outro lugar.
 
-## Problema
+A ideia: o assistente responde na hora, ajuda a marcar a consulta e só chama uma pessoa quando o caso pede (urgência, dúvida que ele não entendeu, pedido de falar com a equipe).
 
-Clínicas pequenas respondem pacientes no WhatsApp à mão, fora do horário e entre atendimentos. O MARFIM foi pensado para responder, agendar e organizar essas conversas, deixando a equipe da clínica no controle pelo painel.
+## Valor para o negócio
 
-## Arquitetura
-
-```mermaid
-flowchart LR
-    P([Paciente]) -->|mensagem| W[WhatsApp via Evolution API<br/>somente em testes]
-    W --> N[n8n<br/>fluxo piloto gerado por script]
-    N -->|API /v1<br/>chave por clinica| A[FastAPI]
-    N <--> R[(Redis<br/>debounce e memoria<br/>de mensagens)]
-    A --> D[(PostgreSQL<br/>Row Level Security)]
-    C[Caddy<br/>proxy reverso] --> A
-    S([Equipe da clinica]) -->|painel e agenda propria| C
-    N -.->|respostas| O[OpenAI]
-```
-
-| Componente | Papel |
-|---|---|
-| Evolution API | Ponte com o WhatsApp. Usada **somente em testes** |
-| n8n | Orquestra o fluxo. Fluxo piloto gerado por script, com deduplicação e teto de uso |
-| API `/v1` (FastAPI) | Uma chave de API por clínica |
-| PostgreSQL com RLS | Isolamento de dados por clínica no próprio banco |
-| Redis | Debounce de mensagens e memória da conversa (armazena as mensagens do usuário) |
-| Painel e agenda própria | Jinja2, papéis com escopo, login em 2 etapas para admin |
-| Caddy | Proxy reverso |
-| Docker Compose | Empacotamento dos serviços |
+- **Menos mensagem perdida.** Quem escreve fora do horário recebe resposta.
+- **Agenda organizada.** As consultas marcadas pelo assistente caem direto na agenda da clínica.
+- **Equipe focada.** A tela "Hoje" mostra só o que precisa de gente, com o que é urgente primeiro.
+- **Cada clínica enxerga só os próprios dados.**
 
 ## Telas
 
-| Tela | Para que serve |
+<table>
+  <tr>
+    <td align="center"><img src="assets/hoje.png" width="420" alt="Tela Hoje"><br><b>Hoje</b><br>O que precisa de atenção agora</td>
+    <td align="center"><img src="assets/conversas.png" width="420" alt="Tela Conversas"><br><b>Conversas</b><br>Atendimentos do assistente, urgentes primeiro</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="assets/clinica.png" width="420" alt="Tela Clínica"><br><b>Clínica</b><br>Profissionais, consultas e horários</td>
+    <td align="center"><img src="assets/equipe.png" width="420" alt="Tela Equipe"><br><b>Equipe</b><br>Cada pessoa vê só a agenda do seu profissional</td>
+  </tr>
+</table>
+
+O painel também tem as telas Agenda e Pacientes.
+
+## Como funciona
+
+```mermaid
+flowchart LR
+    P([Paciente escreve no WhatsApp]) --> A[Assistente responde]
+    A -->|quer marcar consulta| G[(Agenda da clínica)]
+    A -->|caso urgente ou dúvida| E([Equipe da clínica assume])
+    G --> E
+```
+
+## O que eu fiz neste projeto
+
+- Levantei os requisitos e as regras de negócio com quem conhece a rotina da clínica.
+- Desenhei os dados: pacientes, agenda, conversas, profissionais e permissões.
+- Defini os critérios de aceite de cada funcionalidade.
+- Orientei e revisei o trabalho da IA, que escreveu boa parte do código.
+- Conduzi o projeto em Scrum, com backlog e entregas curtas.
+
+Time: eu (único que programa), Joaquim (vendas) e JP (odontologia e Instagram).
+
+> Boa parte do código foi construída com apoio de IA generativa, e os testes automáticos também; eu defino o que o sistema precisa fazer e reviso o resultado.
+
+## O que está provado e o que ainda não
+
+| Provado | Ainda não provado |
 |---|---|
-| Hoje | Visão do dia da clínica |
-| Agenda | Agenda própria do MARFIM |
-| Pacientes | Cadastro e histórico |
-| Conversas | Acompanhamento das conversas do assistente |
-| Equipe | Gestão de pessoas e papéis |
-| Clínica | Configurações da clínica |
-| Painel do operador | Visão de operação |
+| Cerca de 1.980 testes automáticos passando a cada alteração (gerados com apoio de IA e revisados por mim) | Clínica usando de verdade |
+| Fluxo de atendimento validado em 41 cenários simulados | Uso real com WhatsApp, n8n e provedor de IA |
+| Cada clínica enxerga só os próprios dados | Servidor e domínio contratados |
+| Consentimento, histórico de alterações e exclusão de dados de paciente implementados | Revisão jurídica e termo de piloto |
+| Uma falha de acesso entre profissionais foi encontrada e corrigida | Dois pontos de risco médio ainda abertos e documentados |
+| Site de apresentação com 11 seções | Backup testado no servidor |
 
-## Segurança
+## Stack
 
-Foram feitos 3 relatórios de segurança.
+Python, FastAPI, PostgreSQL, Redis, n8n e Docker. Verificações automáticas rodam a cada alteração no GitHub Actions.
 
-| Item | Situação |
-|---|---|
-| Falha de severidade **Alta**: profissional conseguia alcançar paciente de outro profissional | Encontrada e **corrigida** |
-| M-1 (risco médio) | **Aberto e documentado** |
-| M-2 (risco médio) | **Aberto e documentado** |
+## Estado atual
 
-Também: login em 2 etapas para admin, papéis com escopo, chave por clínica na API, Redis com usuário e senha por serviço e contêineres com privilégios mínimos (preparado para o deploy).
-
-## Privacidade
-
-- Consentimento **versionado**
-- Trilha de **auditoria**
-- Ferramenta de **eliminação de dados por titular**
-- Isolamento por clínica com Row Level Security
-
-Estes são recursos técnicos implementados. **Não houve revisão jurídica**, então este projeto não afirma conformidade com nenhuma lei.
-
-## Qualidade
-
-| Verificação | Resultado |
-|---|---|
-| Testes (pytest) | cerca de **1.980** |
-| CI no GitHub Actions | **6 de 6** checks no PR nº 1 |
-| bandit, gitleaks, pip-audit | rodam no CI |
-| Migrações numeradas | **21** |
-| Cenários simulados offline do n8n | 41 |
-| Versões | `v0.1.0` e `v0.1.1` |
-| Landing page | 11 seções, Lighthouse mobile 100 em acessibilidade e boas práticas |
-
-## O que está provado e o que ainda não foi
-
-| O que está provado | O que ainda não foi provado |
-|---|---|
-| Suíte de cerca de 1.980 testes passando no CI (6 de 6) | Cliente pagante |
-| Isolamento por clínica (RLS) e 21 migrações | Piloto real |
-| Falha Alta encontrada e corrigida | Uso real com n8n, Evolution API, WhatsApp e OpenAI |
-| Fluxo n8n validado por 41 cenários simulados offline | VPS e domínio contratados |
-| Consentimento, auditoria e eliminação por titular implementados | Ensaio de infraestrutura após o endurecimento final |
-| Varreduras bandit, gitleaks e pip-audit no CI | Backup na VPS |
-| | Revisão jurídica, termo de piloto e registro no INPI |
-| | Correção de M-1 e M-2 |
-
-## Roteiro
-
-1. Fechar M-1 e M-2.
-2. Contratar VPS e domínio e ensaiar a infraestrutura após o endurecimento final (portões A, B e C, script de teste pós-deploy, unidades systemd, backup cifrado).
-3. Revisão jurídica e termo de piloto.
-4. Piloto com uma clínica.
-
-## Como foi feito
-
-O desenvolvimento foi feito com agentes de IA (**Claude Code**), com revisão e decisões minhas, testes automatizados e relatórios de segurança. Uso IA generativa como ferramenta, com disciplina de engenharia.
+1. Pré-lançamento interno, sem clientes e sem piloto real.
+2. Tudo foi simulado e testado, mas ainda não rodou com pacientes de verdade.
+3. Versões `v0.1.0` e `v0.1.1` publicadas.
+4. Falta: corrigir os dois riscos médios, contratar servidor e domínio, passar por revisão jurídica e fazer o primeiro piloto com uma clínica.
 
 ## Autor
 
